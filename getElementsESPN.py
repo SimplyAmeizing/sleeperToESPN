@@ -64,7 +64,6 @@ def getRosterESPN(weekNumber):
             print(response)
             print("Request failed with status code:", response.status_code)
 
-    print(finalArray)
     return finalArray
 
 
@@ -130,10 +129,10 @@ def addAllPlayersESPN(weekNumber, sleeperRoster):
         'x-fantasy-source': 'kona',
         }
 
-        if i is 5:
-            time.sleep(40)
-        elif i is 8:
-            time.sleep(40)
+        if i == 5:
+            time.sleep(120)
+        elif i == 8:
+            time.sleep(120)
 
         for j in sleeperRoster[i-1]:
             json_data = {

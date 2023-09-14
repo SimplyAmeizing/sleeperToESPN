@@ -27,7 +27,7 @@ async def main():
     time.sleep(2)
 
     await SubmitPassword(driver, password)
-    time.sleep(30)
+    time.sleep(5)
 
     sleeperConvertedToEspnId = await queryLeagueDetail(sys.argv[1])
     time.sleep(2)

@@ -56,7 +56,7 @@ async def queryLeagueDetail(weekNumber):
             matchup = "matchup_legs_" + weekNumber
 
             players = [None] * 10
-            
+
             for i in data['data'][matchup]:
                 tempArray = []
                 for j in i['players']:
@@ -90,8 +90,6 @@ async def queryLeagueDetail(weekNumber):
                     players[0] = tempArray
                 elif(i['roster_id'] == 10):#Kingsley
                     players[2] = tempArray
-                
-                print(players)
 
         finalRes = []
         with open('espnPlayers.json') as f:
