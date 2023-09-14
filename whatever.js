@@ -48,7 +48,7 @@ fetch("https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segm
         return a.json(); // call the json method on the response to get JSON
     })
     .then(function (json) {
-        // console.log(json);
+        console.log(json);
         // console.log(json['schedule'][0]['away']['rosterForCurrentScoringPeriod']['entries'])
     });
 

@@ -23,7 +23,7 @@ async def SubmitPassword(driver, username):
     click_element = driver.find_element(By.CLASS_NAME, "app-button-gradient.login-button")
     click_element.click()
 
-async def queryLeagueDetail(players, weekNumber):
+async def queryLeagueDetail(weekNumber):
     url = "https://sleeper.com/graphql"
 
     headers = {
@@ -42,10 +42,10 @@ async def queryLeagueDetail(players, weekNumber):
     payload = {
         "operationName": "get_league_detail",
         "variables": {},
-        "query": "query get_league_detail { league_rosters(league_id: \"992182224076255232\") { league_id metadata owner_id co_owners players roster_id settings starters keepers reserve taxi player_map } league_users(league_id: \"992182224076255232\") { avatar user_id league_id metadata settings display_name is_owner is_bot } league_transactions_filtered(league_id: \"992182224076255232\", roster_id_filters: [], type_filters: [], leg_filters: [], status_filters: [\"pending\",\"proposed\"]) { adds consenter_ids created creator draft_picks drops league_id leg metadata roster_ids settings status status_updated transaction_id type player_map waiver_budget } matchup_legs_1:matchup_legs(league_id: \"992182224076255232\", round:" + str(weekNumber) + ") { league_id leg matchup_id roster_id round starters players player_map points proj_points max_points custom_points starters_games picks bans } }"
+        "query": "query get_league_detail { league_rosters(league_id: \"992182224076255232\") { league_id metadata owner_id co_owners players roster_id settings starters keepers reserve taxi player_map } league_users(league_id: \"992182224076255232\") { avatar user_id league_id metadata settings display_name is_owner is_bot } league_transactions_filtered(league_id: \"992182224076255232\", roster_id_filters: [], type_filters: [], leg_filters: [], status_filters: [\"pending\",\"proposed\"]) { adds consenter_ids created creator draft_picks drops league_id leg metadata roster_ids settings status status_updated transaction_id type player_map waiver_budget } matchup_legs_" + str(weekNumber) + ":matchup_legs(league_id: \"992182224076255232\", round:" + str(weekNumber) + ") { league_id leg matchup_id roster_id round starters players player_map points proj_points max_points custom_points starters_games picks bans } }"
     }
 
-    response = requests.post(url, headers=headers, json=payload)
+    response = requests.post(url, headers=headers, json=payload, verify=False)
 
     if response.status_code == 200:
         data = response.json()
@@ -53,7 +53,11 @@ async def queryLeagueDetail(players, weekNumber):
         count = 0
         with open('sleeperPlayers.json') as f:
             jsonData = json.load(f)
-            for i in data['data']['matchup_legs_1']:
+            matchup = "matchup_legs_" + weekNumber
+
+            players = [None] * 10
+            
+            for i in data['data'][matchup]:
                 tempArray = []
                 for j in i['players']:
                     if('espn_id' not in jsonData[j]):
@@ -66,7 +70,28 @@ async def queryLeagueDetail(players, weekNumber):
                     else:
                         tempArray.append(jsonData[j]['full_name'])
 
-                players.append(tempArray)
+                if(i['roster_id'] == 1):#Justin
+                    players[4] = tempArray
+                elif(i['roster_id'] == 2):#Matt
+                    players[5] = tempArray
+                elif(i['roster_id'] == 3):#Ethan
+                    players[7] = tempArray
+                elif(i['roster_id'] == 4):#Kabir
+                    players[6] = tempArray
+                elif(i['roster_id'] == 5):#Tiya
+                    players[3] = tempArray
+                elif(i['roster_id'] == 6):#Benny
+                    players[8] = tempArray
+                elif(i['roster_id'] == 7):#Baker
+                    players[9] = tempArray
+                elif(i['roster_id'] == 8):#Brady
+                    players[1] = tempArray
+                elif(i['roster_id'] == 9):#Chris
+                    players[0] = tempArray
+                elif(i['roster_id'] == 10):#Kingsley
+                    players[2] = tempArray
+                
+                print(players)
 
         finalRes = []
         with open('espnPlayers.json') as f:
@@ -84,7 +109,6 @@ async def queryLeagueDetail(players, weekNumber):
 
                 finalRes.append(tempArray)
 
-        print(finalRes)
         return finalRes
         
     else:
