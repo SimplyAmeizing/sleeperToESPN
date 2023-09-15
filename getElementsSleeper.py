@@ -76,10 +76,10 @@ async def queryLeagueDetail(weekNumber):
                     players[5] = tempArray
                 elif(i['roster_id'] == 3):#Ethan
                     players[7] = tempArray
-                elif(i['roster_id'] == 4):#Kabir
-                    players[6] = tempArray
-                elif(i['roster_id'] == 5):#Tiya
+                elif(i['roster_id'] == 4):#Tiya
                     players[3] = tempArray
+                elif(i['roster_id'] == 5):#Kabir
+                    players[6] = tempArray
                 elif(i['roster_id'] == 6):#Benny
                     players[8] = tempArray
                 elif(i['roster_id'] == 7):#Baker
