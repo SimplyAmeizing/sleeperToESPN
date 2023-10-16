@@ -19,7 +19,13 @@ fetch("https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/seg
   "method": "POST",
   "mode": "cors",
   "credentials": "include"
-});
+}).then(function (a) {
+  return a.json(); // call the json method on the response to get JSON
+})
+.then(function (json) {
+  console.log(json);
+  // console.log(json['schedule'][0]['away']['rosterForCurrentScoringPeriod']['entries'])
+});;
 
 
 
@@ -74,7 +80,13 @@ fetch("https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/seg
     "method": "POST",
     "mode": "cors",
     "credentials": "include"
-    });
+    }).then(function (a) {
+      return a.json(); // call the json method on the response to get JSON
+  })
+  .then(function (json) {
+      console.log(json);
+      // console.log(json['schedule'][0]['away']['rosterForCurrentScoringPeriod']['entries'])
+  });;
 
 //antoher example of drop but on kingsleys team
 fetch("https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/", {
@@ -97,4 +109,10 @@ fetch("https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/seg
     "method": "POST",
     "mode": "cors",
     "credentials": "include"
-    });
+    }).then(function (a) {
+      return a.json(); // call the json method on the response to get JSON
+  })
+  .then(function (json) {
+      console.log(json);
+      // console.log(json['schedule'][0]['away']['rosterForCurrentScoringPeriod']['entries'])
+  });;

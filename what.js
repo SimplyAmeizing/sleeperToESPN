@@ -36,4 +36,10 @@ fetch("https://sleeper.com/graphql", {
   "method": "POST",
   "mode": "cors",
   "credentials": "include"
-});
+}).then(function (a) {
+  return a.json(); // call the json method on the response to get JSON
+})
+.then(function (json) {
+  console.log(json);
+  // console.log(json['schedule'][0]['away']['rosterForCurrentScoringPeriod']['entries'])
+});;

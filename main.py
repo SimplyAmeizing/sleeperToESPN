@@ -17,40 +17,73 @@ async def main():
     username = "simplyameizing"
     password = "Mc384179"
 
-    driver = webdriver.Chrome()
+    # driver = webdriver.Chrome()
 
-    # head to github login page
-    driver.get("https://sleeper.com/login")
-    # find username/email field and send the username itself to the input field
+    # # head to github login page
+    # driver.get("https://sleeper.com/login")
+    # # find username/email field and send the username itself to the input field
 
-    await SubmitUsername(driver, username)
-    time.sleep(2)
+    # await SubmitUsername(driver, username)
+    # time.sleep(2)
 
-    await SubmitPassword(driver, password)
-    time.sleep(30)
-
-    sleeperConvertedToEspnId = await queryLeagueDetail(sys.argv[1])
-    time.sleep(2)
-
-    driver.close()
-    # service = Service(executable_path="C:\Personal\SleeperToEspn\geckodriver.exe")
-
-    # firefox_options = Options()
-    # firefox_options.add_argument('--headless')
-
-    # Initialize the Firefox driver with headless options
-    # driver = webdriver.Firefox(service=service)
-
-    # driver.get("https://www.espn.com/fantasy/football/")
+    # await SubmitPassword(driver, password)
     # time.sleep(30)
 
-    litArray = getRosterESPN(sys.argv[1])
+    weekNumber = input("What week number is it in the NFL right now: ")
+    action = input("Enter populate or lineup: ")
 
-    dropAllPlayersESPN(sys.argv[1], litArray)
+    if (action == "populate"):
 
-    addAllPlayersESPN(sys.argv[1], sleeperConvertedToEspnId)
+        finalStarters = []
+        sleeperConvertedToEspnId = await queryLeagueDetail(weekNumber, finalStarters)
 
-    print(litArray)
+        # driver.close()
+        # service = Service(executable_path="C:\Personal\SleeperToEspn\geckodriver.exe")
+
+        # firefox_options = Options()
+        # firefox_options.add_argument('--headless')
+
+        # Initialize the Firefox driver with headless options
+        # driver = webdriver.Firefox(service=service)
+
+        # driver.get("https://www.espn.com/fantasy/football/")
+        # time.sleep(30)
+
+        litArray = getRosterESPN(weekNumber)
+
+        dropAllPlayersESPN(weekNumber, litArray)
+
+        addAllPlayersESPN(weekNumber, sleeperConvertedToEspnId, finalStarters)
+
+        print(litArray)
+    
+    elif (action == "lineup"):
+        service = Service(executable_path="D:\PersonalProjects\SleeperToEspn\geckodriver.exe")
+
+        # firefox_options = Options()
+        # firefox_options.add_argument('--headless')
+
+        # # Initialize the Firefox driver with headless options
+        # driver = webdriver.Firefox(service=service)
+
+        # # head to github login page
+        # driver.get("https://sleeper.com/login")
+        # # find username/email field and send the username itself to the input field
+
+        # await SubmitUsername(driver, username)
+        # time.sleep(2)
+
+        # await SubmitPassword(driver, password)
+        # time.sleep(30)
+
+        finalStarters = []
+        sleeperConvertedToEspnId = await queryLeagueDetail(weekNumber, finalStarters)
+
+        setLineup(weekNumber, finalStarters)
+    
+
+        
+
 
 #add functionality to add in week number to the main parameter
 if __name__ == '__main__':

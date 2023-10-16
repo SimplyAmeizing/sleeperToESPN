@@ -107,7 +107,7 @@ def dropAllPlayersESPN(weekNumber, playersArray):
         #maybe it shouldn't be verify=false?
         requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data, verify=False)
 
-def addAllPlayersESPN(weekNumber, sleeperRoster):
+def addAllPlayersESPN(weekNumber, sleeperRoster, finalStarters):
     
     for i in range(1, 11):
         headers = {
@@ -134,7 +134,32 @@ def addAllPlayersESPN(weekNumber, sleeperRoster):
         elif i == 8:
             time.sleep(120)
 
+        addLaterArray = []
         for j in sleeperRoster[i-1]:
+            if (j in finalStarters[i-1]):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'FREEAGENT',
+                    'scoringPeriodId': weekNumber,
+                    'executionType': 'EXECUTE',
+                    'items': [],
+                    'isActingAsTeamOwner': False,
+                    'skipTransactionCounters': False,
+                }
+
+                dictTemp = {}
+                dictTemp['playerId'] = j
+                dictTemp['type'] = "ADD"
+                dictTemp['toTeamId'] = i
+                json_data['items'].append(dictTemp)
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data, verify=False)
+
+            else:
+                addLaterArray.append(j)
+
+        for j in addLaterArray:
             json_data = {
                 'isLeagueManager': True,
                 'teamId': i,
@@ -153,3 +178,318 @@ def addAllPlayersESPN(weekNumber, sleeperRoster):
             json_data['items'].append(dictTemp)
 
             response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data, verify=False)
+
+
+def setLineup(weeknumber, finalStarters):
+    for i in range(1, 11):
+
+        rosterESPN = getRosterESPN(weeknumber)
+        rbCount = 0
+        wrCount = 0
+        teCount = 0
+        for j in rosterESPN[i-1]:
+            headers = {
+                'authority': 'lm-api-writes.fantasy.espn.com',
+                'accept': 'application/json',
+                'accept-language': 'en-US,en;q=0.9',
+                'origin': 'https://fantasy.espn.com',
+                'referer': 'https://fantasy.espn.com/',
+                'sec-ch-ua': '"Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'same-site',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+                'x-fantasy-platform': 'kona-PROD-6ee6d5a5bb4b5179168f499396f975244a11e9e5',
+                'x-fantasy-source': 'kona',
+            }
+            
+            with open('espnPlayers.json') as f:
+                jsonData = json.load(f)
+
+                defaultPositionId = None
+                for item in jsonData:
+                    if (item['id'] == j):
+                        defaultPositionId = item["defaultPositionId"]
+
+            if(defaultPositionId == 1):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 0,
+                            'toLineupSlotId': 20,
+                        },
+                    ],
+                }
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+
+
+            elif(defaultPositionId == 2):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 2,
+                            'toLineupSlotId': 20,
+                        },
+                    ],
+                }
+
+                # if (rbCount == 2):
+                #     json_data['items']['fromLineupSlotId'] = 23
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+                # if(response.status_code == "200"):
+                #     rbCount += 1
+
+            elif(defaultPositionId == 3):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 4,
+                            'toLineupSlotId': 20,
+                        },
+                    ],
+                }
+
+                # if (wrCount == 2):
+                #     json_data['items'][0]['fromLineupSlotId'] = 23
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+                # if(response.status_code == "200"):
+                #     wrCount += 1
+
+            elif(defaultPositionId == 4):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 6,
+                            'toLineupSlotId': 20,
+                        },
+                    ],
+                }
+
+                # if (teCount == 2):
+            #         json_data['items'][0]['fromLineupSlotId'] = 23
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+                # if(response.status_code == "200"):
+                #     teCount += 1
+
+            elif(defaultPositionId == 5):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 17,
+                            'toLineupSlotId': 20
+                        },
+                    ],
+                }
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+
+            elif(defaultPositionId == 16):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 16,
+                            'toLineupSlotId': 20
+                        },
+                    ],
+                }
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+        
+        for j in finalStarters[i-1]:
+
+
+            with open('espnPlayers.json') as f:
+                jsonData = json.load(f)
+
+                defaultPositionId = None
+                for item in jsonData:
+                    if (item['id'] == j):
+                        defaultPositionId = item["defaultPositionId"]
+
+            if(defaultPositionId == 1):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 20,
+                            'toLineupSlotId': 0,
+                        },
+                    ],
+                }
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+
+
+            elif(defaultPositionId == 2):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 20,
+                            'toLineupSlotId': 2,
+                        },
+                    ],
+                }
+
+                if (rbCount == 2):
+                    json_data['items'][0]['toLineupSlotId'] = 23
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+                rbCount += 1
+
+            elif(defaultPositionId == 3):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 20,
+                            'toLineupSlotId': 4,
+                        },
+                    ],
+                }
+
+                if (wrCount == 2):
+                    json_data['items'][0]['toLineupSlotId'] = 23
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+                wrCount += 1
+
+            elif(defaultPositionId == 4):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 20,
+                            'toLineupSlotId': 6,
+                        },
+                    ],
+                }
+
+                if (teCount == 2):
+                    json_data['items'][0]['toLineupSlotId'] = 23
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+                teCount += 1
+
+            elif(defaultPositionId == 5):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 20,
+                            'toLineupSlotId': 17
+                        },
+                    ],
+                }
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+
+            elif(defaultPositionId == 16):
+                json_data = {
+                    'isLeagueManager': True,
+                    'teamId': i,
+                    'type': 'ROSTER',
+                    'memberId': '{F53FF6DD-1278-4465-BF66-72F48AAA1569}',
+                    'scoringPeriodId': weeknumber,
+                    'executionType': 'EXECUTE',
+                    'items': [
+                        {
+                            'playerId': j,
+                            'type': 'LINEUP',
+                            'fromLineupSlotId': 20,
+                            'toLineupSlotId': 16
+                        },
+                    ],
+                }
+
+                response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/1908531039/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
+
