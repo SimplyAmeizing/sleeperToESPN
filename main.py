@@ -1,8 +1,3 @@
-from audioop import add
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
 import time
 import requests
 import json
@@ -10,7 +5,6 @@ import asyncio
 from getElementsSleeper import *
 from getElementsESPN import *
 import sys
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 
 async def main():
