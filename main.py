@@ -8,6 +8,15 @@ import sys
 from selenium.webdriver.chrome.service import Service
 
 async def main():
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    # Monkeypatch requests.Session.request to always verify=False
+    _old_request = requests.Session.request
+    def _new_request(self, *args, **kwargs):
+        kwargs['verify'] = False
+        return _old_request(self, *args, **kwargs)
+    requests.Session.request = _new_request
+    
     username = "simplyameizing"
     password = "Mc384179"
 
@@ -23,13 +32,16 @@ async def main():
     # await SubmitPassword(driver, password)
     # time.sleep(30)
 
-    weekNumber = input("What week number is it in the NFL right now: ")
+    sleeperLeagueId = "1255956974311321600"
+    espnLeagueId = "402922762"
+    weekNumber = input("Enter week number: ")
     action = input("Enter populate or lineup: ")
 
     if (action == "populate"):
 
         finalStarters = []
-        sleeperConvertedToEspnId = await queryLeagueDetail(weekNumber, finalStarters)
+
+        sleeperConvertedToEspnId = await convertSleeperRosterToEspnIds(sleeperLeagueId)
 
         # driver.close()
         # service = Service(executable_path="C:\Personal\SleeperToEspn\geckodriver.exe")
@@ -43,13 +55,13 @@ async def main():
         # driver.get("https://www.espn.com/fantasy/football/")
         # time.sleep(30)
 
-        litArray = getRosterESPN(weekNumber)
+        espnRostersForLeague = getRosterESPN()
 
-        dropAllPlayersESPN(weekNumber, litArray)
+        dropAllPlayersESPN(weekNumber, espnRostersForLeague)
 
-        addAllPlayersESPN(weekNumber, sleeperConvertedToEspnId, finalStarters)
+        addAllPlayersESPN(weekNumber, sleeperConvertedToEspnId, sleeperConvertedToEspnId)
 
-        print(litArray)
+        # print(litArray)
     
     elif (action == "lineup"):
         service = Service(executable_path="D:\PersonalProjects\SleeperToEspn\geckodriver.exe")
@@ -70,10 +82,10 @@ async def main():
         # await SubmitPassword(driver, password)
         # time.sleep(30)
 
-        finalStarters = []
-        sleeperConvertedToEspnId = await queryLeagueDetail(weekNumber, finalStarters)
+        # finalStarters = []
+        # sleeperConvertedToEspnId = await queryLeagueDetail(weekNumber, finalStarters)
 
-        setLineup(weekNumber, finalStarters)
+        # setLineup(weekNumber, finalStarters)
     
 
         
