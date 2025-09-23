@@ -2,7 +2,6 @@ import requests
 import asyncio
 from getElementsSleeper import *
 from getElementsESPN import *
-from selenium.webdriver.chrome.service import Service
 
 async def main():
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -16,17 +15,27 @@ async def main():
 
     sleeperLeagueId = "1255956974311321600"
     weekNumber = input("Enter week number: ")
-    action = input("Enter populate or lineup: ")
+    action = input("Enter populate or lineup or all: ")
 
-    if (action == "populate"):
+    sleeperConvertedToEspnId = await convertSleeperRosterToEspnIds(sleeperLeagueId)
+    slotMap = {}
 
-        sleeperConvertedToEspnId = await convertSleeperRosterToEspnIds(sleeperLeagueId)
-
+    if (action == "populate" or action == "all"):
+        playedArray = set()
         espnRostersForLeague = getRosterESPN()
 
         dropAllPlayersESPN(weekNumber, espnRostersForLeague)
 
-        addAllPlayersESPN(weekNumber, sleeperConvertedToEspnId, sleeperConvertedToEspnId)
+        addAllPlayersESPN(weekNumber, sleeperConvertedToEspnId)
+
+    if (action == "lineup" or action == "all"):
+        playedArray = getPlayedArray(weekNumber)
+
+        setLineupESPN(weekNumber, sleeperConvertedToEspnId, playedArray)
+
+
+
+
 
 #add functionality to add in week number to the main parameter
 if __name__ == '__main__':
