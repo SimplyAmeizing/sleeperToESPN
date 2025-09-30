@@ -7,6 +7,7 @@ import urllib3
 from models.player import Player
 from datetime import datetime, timezone, timedelta
 import pytz
+import sys
 
 def getRosterESPN():
     league = League(league_id=402922762, 
@@ -52,8 +53,6 @@ def getPlayedArray(weekNumber):
         }
 
     playedArray = {}
-    slotMap = {}
-    current_time = datetime.now(timezone.utc)
     box = league.box_scores(int(weekNumber))
     teamConversion = {
         "Team(Ben)" : 6,
@@ -70,21 +69,7 @@ def getPlayedArray(weekNumber):
 
     for matchup in box:
         for player in matchup.home_lineup:
-            game_start = player.game_date
-            central = pytz.timezone('US/Central')
-            if game_start.tzinfo is None:
-                game_start = central.localize(game_start)
-            
-            now_central = datetime.now(central)
-            estimated_game_length = timedelta(hours=3, minutes=30)
-
-            if game_start <= now_central < (game_start + estimated_game_length):
-                playedArray[player.playerId] = player.position
-
-
-            if player.game_played:
-                playedArray[player.playerId] = player.position
-
+            playedArray[player.playerId] = player.position
             if player.lineupSlot != "BE":
                 if player.lineupSlot == "QB":
                     json_data = {
@@ -213,21 +198,7 @@ def getPlayedArray(weekNumber):
                 response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2025/segments/0/leagues/402922762/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
     
         for player in matchup.away_lineup:
-            game_start = player.game_date
-            central = pytz.timezone('US/Central')
-            if game_start.tzinfo is None:
-                game_start = central.localize(game_start)
-            
-            now_central = datetime.now(central)
-            estimated_game_length = timedelta(hours=3, minutes=30)
-
-            if game_start <= now_central < (game_start + estimated_game_length):
-                playedArray[player.playerId] = player.position
-
-
-            if player.game_played:
-                playedArray[player.playerId] = player.position
-
+            playedArray[player.playerId] = player.position
             if player.lineupSlot != "BE":
                 if player.lineupSlot == "QB":
                     json_data = {
@@ -355,6 +326,7 @@ def getPlayedArray(weekNumber):
                 
                 response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2025/segments/0/leagues/402922762/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
                     
+    print(sys.getsizeof(playedArray))
     return playedArray
 
 def setLineupESPN(weekNumber, espnPlayers, playedArray):
@@ -383,8 +355,6 @@ def setLineupESPN(weekNumber, espnPlayers, playedArray):
         wr_count = 0
         count = 0
         for j in espnPlayers[leagueTeamList[i-1]]:
-            # if count == 9:
-            #     break
             if int(j) in playedArray:
                 if playedArray[int(j)] == "QB":
                     json_data = {
@@ -599,8 +569,6 @@ def addAllPlayersESPN(weekNumber, sleeperRoster):
             json_data['items'].append(dictTemp)
 
             response = requests.post('https://lm-api-writes.fantasy.espn.com/apis/v3/games/ffl/seasons/2025/segments/0/leagues/402922762/transactions/', cookies=cookiesESPN, headers=headers, json=json_data)
-            if response.status_code == 200:
-                slotMap
             if response.status_code == 409:
                 print(f"409 Conflict! Cooling down for 5 minutes...")
                 # Status code
